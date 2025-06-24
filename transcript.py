@@ -29,7 +29,7 @@ class give_summary():
         else:
             self.real_trasn=" ".join([t['text'] for t in transcript if t['start']<=time_stamp])
 
-        prompt_s = f"Summarize this transcript briefly:\n\n{self.real_trasn}"
+        prompt_s = f"Summarize this transcript in detail:\n\n{self.real_trasn}"
         try:
             response = model.generate_content(prompt_s)
         except Exception as e:

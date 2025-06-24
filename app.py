@@ -6,6 +6,7 @@ import threading
 from concentration_tracker import track_concentration
 from flask import Response
 import time
+from web_summarizer import summarize_web
 
 app = Flask(__name__)
 CORS(app)
@@ -29,6 +30,34 @@ def video_feed():
             time.sleep(0.033)  
     
     return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/web_summarize', methods=['POST'])
+def web_summarize():
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'error': 'No JSON data provided'}), 400
+            
+        link = data.get('link')
+        
+        if not link:
+            return jsonify({'error': 'No link provided'}), 400
+
+        print(f"Received web link: {link}")  # Debug log
+        
+        summary = summarize_web(link)
+        
+        if summary:
+            return jsonify({'summary': summary, 'status': 'success'})
+        else:
+            return jsonify({'error': 'Failed to summarize the web page'}), 500
+            
+    except Exception as e:
+        print(f"Error in web_summarize: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
 
 @app.route('/score_feed')
 def score_feed():
