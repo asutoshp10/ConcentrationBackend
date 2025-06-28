@@ -1,0 +1,9 @@
+Flask
+youtube-transcript-api
+google-generativeai
+flask_cors
+opencv-python
+mediapipe
+bs4
+librosa
+scikit-learn

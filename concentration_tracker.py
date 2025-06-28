@@ -7,6 +7,7 @@ from flask import Response
 
 mp_face_mesh = mp.solutions.face_mesh
 face_mesh = mp_face_mesh.FaceMesh(refine_landmarks=True)
+level=100
 
 LEFT_EYE = [33, 160, 158, 133, 153, 144]
 RIGHT_EYE = [362, 385, 387, 263, 373, 380]
@@ -65,7 +66,7 @@ def bar(score, frame):
                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (200, 200, 200), 2)
 
 
-def track_concentration(score_container,frame_container):
+def track_concentration(score_container,frame_container,distraction_container):
     cap = cv2.VideoCapture(0)
     distraction = 0
 
@@ -89,7 +90,7 @@ def track_concentration(score_container,frame_container):
                 head_score = get_head_pose_score(landmarks, image_w, image_h)
                 smooth_score = compute_concentration_score(gaze_score, head_score, blink)
                 bar(smooth_score, frame)
-                score_container['value']=distraction
+                score_container['value']=smooth_score
                 color = (0, 255, 0) if smooth_score >= 40 else (0, 0, 255)
                 cv2.putText(frame, f'Concentration: {smooth_score}%', 
                            (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
@@ -100,12 +101,12 @@ def track_concentration(score_container,frame_container):
 
                 if smooth_score < 40:
                     distraction += 1
-                    if distraction > 100:
+                    if distraction > level:
                         distraction = 0
                         cap.release()
                         cv2.destroyAllWindows()
                         return True  # Trigger summary
-        
+        distraction_container['value'] = (distraction/level)*100   
         ret, buffer = cv2.imencode('.jpg', frame)
         frame_container['frame'] = buffer.tobytes()
         
