@@ -40,6 +40,31 @@ def get_gaze_score(landmarks):
 def compute_concentration_score(gaze, head_pose, blink):
     return round((0.4 * gaze + 0.4 * head_pose + 0.2 * (0 if blink else 1)) * 100, 2)
 
+def bar(score, frame):
+    bar_width = 200
+    bar_height = 30
+    bar_x = 30
+    bar_y = 100
+    
+    cv2.rectangle(frame, (bar_x, bar_y), 
+                 (bar_x + bar_width, bar_y + bar_height), 
+                 (50, 50, 50), -1)
+    
+    fill_width = int(score * bar_width / 100)
+    color = (0, 255, 0) if score > 40 else (0, 100, 255)
+    cv2.rectangle(frame, (bar_x, bar_y), 
+                 (bar_x + fill_width, bar_y + bar_height), 
+                 color, -1)
+ 
+    cv2.rectangle(frame, (bar_x, bar_y), 
+                 (bar_x + bar_width, bar_y + bar_height), 
+                 (200, 200, 200), 2)
+    
+    cv2.putText(frame, f"{score}%", 
+               (bar_x + bar_width + 10, bar_y + bar_height//2 + 5),
+               cv2.FONT_HERSHEY_SIMPLEX, 0.7, (200, 200, 200), 2)
+
+
 def track_concentration(score_container,frame_container):
     cap = cv2.VideoCapture(0)
     distraction = 0
@@ -63,6 +88,7 @@ def track_concentration(score_container,frame_container):
                 gaze_score = get_gaze_score(landmarks)
                 head_score = get_head_pose_score(landmarks, image_w, image_h)
                 smooth_score = compute_concentration_score(gaze_score, head_score, blink)
+                bar(smooth_score, frame)
                 score_container['value']=distraction
                 color = (0, 255, 0) if smooth_score >= 40 else (0, 0, 255)
                 cv2.putText(frame, f'Concentration: {smooth_score}%', 

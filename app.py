@@ -7,6 +7,8 @@ from concentration_tracker import track_concentration
 from flask import Response
 import time
 from web_summarizer import summarize_web
+from emotion_detector import emotion_detector
+
 
 app = Flask(__name__)
 CORS(app)
@@ -19,6 +21,32 @@ frame_container = {'frame': None}
 def monitor_concentration():
     global concentration_triggered
     concentration_triggered = track_concentration(score_container,frame_container)
+
+def detect_emotion_from_audio(audio_frame):
+    """Real emotion detection from audio frame using trained model"""
+    return emotion_detector.detect_emotion(audio_frame)
+
+@app.route('/api/audio-emotion-stream', methods=['POST'])
+def audio_emotion_stream():
+    """Real-time audio emotion analysis with distraction/concentration flags"""
+    try:
+        # Get audio frame data from request
+        data = request.get_json()
+        audio_frame = data.get('audio_frame', None)
+        
+        if audio_frame is None:
+            return jsonify({'error': 'No audio frame provided'}), 400
+        
+        # Process audio frame through emotion detection
+        emotion_result = detect_emotion_from_audio(audio_frame)
+        
+        # Return the emotion analysis with distraction/concentration flags
+        return jsonify(emotion_result)
+        
+    except Exception as e:
+        print(f"Error in audio emotion stream: {e}")
+        return jsonify({'error': str(e)}), 500
+    
 @app.route('/video_feed')
 def video_feed():
     """Video streaming route that reads from frame_container."""
