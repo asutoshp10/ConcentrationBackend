@@ -7,3 +7,4 @@ mediapipe
 bs4
 librosa
 scikit-learn
+openai

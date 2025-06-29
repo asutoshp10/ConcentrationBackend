@@ -2,7 +2,7 @@ import google.generativeai as genai
 import requests
 from bs4 import BeautifulSoup
 
-genai.configure(api_key="AIzaSyCt07QcDpiIcmMafQ8EzC1U0fhF2apfZ8o")
+genai.configure(api_key="AIzaSyDrek7oHzu_CAS1gkp3xhmMLAHP5bCNkM8")
 model = genai.GenerativeModel("models/gemini-1.5-flash")
 
 def fetch_website_content(url):
@@ -73,6 +73,6 @@ def summarize_web(link):
 
 # Example usage
 if __name__ == "__main__":
-    url = "https://example.com"
+    url = "https://en.wikipedia.org/wiki/Main_Page"
     summary = summarize_web(url)
     print(summary)

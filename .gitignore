@@ -4,6 +4,7 @@ __pycache__/
 *.pyo
 
 # Ignore virtual environment directories
+venv/
 venv310/
 env/
 .venv/
